@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FinançasPRO – Controle Financeiro</title>
+  <meta name="description" content="Controle financeiro simples e eficiente para pequenas empresas. Gerencie receitas, despesas e saldo em tempo real." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <rect width="28" height="28" rx="8" fill="url(#grad1)"/>
+          <path d="M7 14h14M14 7v14" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+          <defs>
+            <linearGradient id="grad1" x1="0" y1="0" x2="28" y2="28">
+              <stop offset="0%" stop-color="#6366f1"/>
+              <stop offset="100%" stop-color="#8b5cf6"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <span class="logo-text">FinançasPRO</span>
+      </div>
+      <button class="sidebar-toggle" id="sidebarToggle" aria-label="Fechar menu">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M15 5L5 15M5 5l10 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="#dashboard" class="nav-item active" id="nav-dashboard">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <rect x="2" y="2" width="7" height="7" rx="1.5" fill="currentColor"/>
+          <rect x="11" y="2" width="7" height="7" rx="1.5" fill="currentColor" opacity=".5"/>
+          <rect x="2" y="11" width="7" height="7" rx="1.5" fill="currentColor" opacity=".5"/>
+          <rect x="11" y="11" width="7" height="7" rx="1.5" fill="currentColor" opacity=".5"/>
+        </svg>
+        <span>Painel</span>
+      </a>
+      <a href="#transactions" class="nav-item" id="nav-transactions">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M4 10h12M4 6h8M4 14h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <span>Transações</span>
+      </a>
+      <a href="#add" class="nav-item" id="nav-add">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M10 6v8M6 10h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <span>Nova Transação</span>
+      </a>
+      <div style="padding:8px 12px 4px;margin-top:8px;border-top:1px solid var(--color-border)">
+        <span style="font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--color-text-muted)">Ferramentas</span>
+      </div>
+      <a href="#calc3d" class="nav-item" id="nav-calc3d">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M4 4h12v12H4z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M4 8h12M8 8v8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="14" cy="6" r="1" fill="currentColor"/>
+        </svg>
+        <span>Precificação 3D</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="user-avatar">MG</div>
+        <div class="user-info">
+          <span class="user-name">Minha Empresa</span>
+          <span class="user-role">Administrador</span>
+        </div>
+        <button class="btn-logout" id="logoutBtn" title="Sair" aria-label="Sair da conta">
+          <svg width="17" height="17" viewBox="0 0 20 20" fill="none">
+            <path d="M13 3h4v14h-4M8 14l4-4-4-4M12 10H3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main" id="main">
+
+    <!-- Top bar -->
+    <header class="topbar">
+      <button class="menu-btn" id="menuBtn" aria-label="Abrir menu">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <path d="M3 11h16M3 5.5h16M3 16.5h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <div class="topbar-title">
+        <h1 id="pageTitle">Painel Financeiro</h1>
+        <span class="topbar-date" id="currentDate"></span>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn-icon" id="themeToggle" title="Alternar tema" aria-label="Alternar tema claro/escuro">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" id="themeIcon">
+            <path d="M10 2v2M10 16v2M4.22 4.22l1.42 1.42M14.36 14.36l1.42 1.42M2 10h2M16 10h2M4.22 15.78l1.42-1.42M14.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="1.8"/>
+          </svg>
+        </button>
+        <button class="btn-primary" id="openModalBtn">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M9 3v12M3 9h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          Nova Transação
+        </button>
+      </div>
+    </header>
+
+    <!-- Dashboard Section -->
+    <section class="section active" id="section-dashboard">
+
+      <!-- Summary Cards -->
+      <div class="cards-grid">
+        <div class="card card-balance">
+          <div class="card-icon card-icon-balance">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <path d="M2 11C2 6.03 6.03 2 11 2s9 4.03 9 9-4.03 9-9 9-9-4.03-9-9z" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M11 7v4l3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="card-content">
+            <span class="card-label">Saldo Atual</span>
+            <span class="card-value" id="balanceValue">R$ 0,00</span>
+            <span class="card-trend" id="balanceTrend"></span>
+          </div>
+        </div>
+
+        <div class="card card-income">
+          <div class="card-icon card-icon-income">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <path d="M11 19V3M5 9l6-6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="card-content">
+            <span class="card-label">Total de Receitas</span>
+            <span class="card-value" id="incomeValue">R$ 0,00</span>
+            <span class="card-sub" id="incomeCount">0 lançamentos</span>
+          </div>
+        </div>
+
+        <div class="card card-expense">
+          <div class="card-icon card-icon-expense">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <path d="M11 3v16M5 13l6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="card-content">
+            <span class="card-label">Total de Despesas</span>
+            <span class="card-value" id="expenseValue">R$ 0,00</span>
+            <span class="card-sub" id="expenseCount">0 lançamentos</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chart + Recent -->
+      <div class="dashboard-grid">
+
+        <!-- Mini Chart -->
+        <div class="widget">
+          <div class="widget-header">
+            <h2 class="widget-title">Resumo Mensal</h2>
+            <span class="badge badge-month" id="currentMonth"></span>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="summaryChart" width="400" height="200"></canvas>
+          </div>
+          <div class="chart-legend">
+            <span class="legend-dot legend-income"></span><span>Receitas</span>
+            <span class="legend-dot legend-expense"></span><span>Despesas</span>
+          </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="widget">
+          <div class="widget-header">
+            <h2 class="widget-title">Últimas Transações</h2>
+            <a href="#transactions" class="link-sm" id="viewAllLink">Ver todas →</a>
+          </div>
+          <div class="transaction-list" id="recentTransactionsList">
+            <!-- populated by JS -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Transactions Section -->
+    <section class="section" id="section-transactions">
+      <div class="widget full-width">
+        <div class="widget-header">
+          <h2 class="widget-title">Todas as Transações</h2>
+          <div class="filter-group">
+            <select class="filter-select" id="filterType">
+              <option value="all">Todos</option>
+              <option value="income">Receitas</option>
+              <option value="expense">Despesas</option>
+            </select>
+            <input type="text" class="filter-input" id="filterSearch" placeholder="Buscar..." />
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="trans-table" id="transactionsTable">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Descrição</th>
+                <th>Categoria</th>
+                <th>Tipo</th>
+                <th class="text-right">Valor</th>
+                <th class="text-right">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="transactionsTableBody">
+              <!-- populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Add Transaction Section -->
+    <section class="section" id="section-add">
+      <div class="widget form-widget">
+        <div class="widget-header">
+          <h2 class="widget-title">Nova Transação</h2>
+        </div>
+        <form id="transactionForm" class="transaction-form" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="txType">Tipo *</label>
+              <div class="type-toggle">
+                <button type="button" class="type-btn active" data-type="income" id="typeIncome">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M8 13V3M3 8l5-5 5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  Receita
+                </button>
+                <button type="button" class="type-btn" data-type="expense" id="typeExpense">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M8 3v10M3 8l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  Despesa
+                </button>
+              </div>
+              <input type="hidden" id="txType" value="income" />
+            </div>
+          </div>
+
+          <div class="form-row two-cols">
+            <div class="form-group">
+              <label for="txDescription">Descrição *</label>
+              <input type="text" id="txDescription" class="form-input" placeholder="Ex: Venda de produto, Aluguel..." maxlength="80" required />
+            </div>
+            <div class="form-group">
+              <label for="txAmount">Valor (R$) *</label>
+              <input type="number" id="txAmount" class="form-input" placeholder="0,00" min="0.01" step="0.01" required />
+            </div>
+          </div>
+
+          <div class="form-row two-cols">
+            <div class="form-group">
+              <label for="txCategory">Categoria</label>
+              <select id="txCategory" class="form-input form-select">
+                <option value="">Selecionar categoria</option>
+                <optgroup label="Receitas" id="incomeCategories">
+                  <option value="Vendas">Vendas</option>
+                  <option value="Serviços">Serviços</option>
+                  <option value="Comissões">Comissões</option>
+                  <option value="Investimentos">Investimentos</option>
+                  <option value="Outros (Receita)">Outros</option>
+                </optgroup>
+                <optgroup label="Despesas" id="expenseCategories">
+                  <option value="Aluguel">Aluguel</option>
+                  <option value="Salários">Salários</option>
+                  <option value="Fornecedores">Fornecedores</option>
+                  <option value="Marketing">Marketing</option>
+                  <option value="Utilidades">Utilidades (Água/Luz/Internet)</option>
+                  <option value="Impostos">Impostos</option>
+                  <option value="Manutenção">Manutenção</option>
+                  <option value="Outros (Despesa)">Outros</option>
+                </optgroup>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="txDate">Data *</label>
+              <input type="date" id="txDate" class="form-input" required />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="txNote">Observação (opcional)</label>
+              <textarea id="txNote" class="form-input form-textarea" placeholder="Adicione uma observação..." maxlength="200" rows="3"></textarea>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" id="clearFormBtn">Limpar</button>
+            <button type="submit" class="btn-primary btn-lg" id="submitBtn">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <path d="M3 9l4 4 8-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Salvar Transação
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- 3D Pricing Calculator Section -->
+    <section class="section" id="section-calc3d">
+
+      <!-- Info Header -->
+      <div class="calc3d-header">
+        <div class="calc3d-header-icon">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <rect x="4" y="4" width="24" height="24" rx="3" stroke="currentColor" stroke-width="2"/>
+            <path d="M4 12h24M12 12v16" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M16 4l6 4-6 4V4z" fill="currentColor" opacity=".3"/>
+          </svg>
+        </div>
+        <div>
+          <h2 class="widget-title" style="font-size:18px">Calculadora de Precificação 3D</h2>
+          <p style="font-size:13px;color:var(--color-text-muted);margin-top:4px">Calcule o custo real e o preço de venda ideal para suas peças impressas em 3D.</p>
+        </div>
+      </div>
+
+      <div class="calc3d-layout">
+
+        <!-- Left: Form -->
+        <div class="widget calc3d-form-widget">
+          <div class="widget-header">
+            <h2 class="widget-title">⚙️ Parâmetros da Impressão</h2>
+          </div>
+
+          <form id="calc3dForm" class="transaction-form" novalidate>
+
+            <!-- Filamento -->
+            <div class="calc3d-section-label">🧵 Material / Filamento</div>
+
+            <div class="form-row two-cols">
+              <div class="form-group">
+                <label for="c3dFilamentType">Tipo de Filamento</label>
+                <select id="c3dFilamentType" class="form-input form-select">
+                  <option value="PLA" data-density="1.24">PLA</option>
+                  <option value="ABS" data-density="1.04">ABS</option>
+                  <option value="PETG" data-density="1.27">PETG</option>
+                  <option value="TPU" data-density="1.21">TPU</option>
+                  <option value="Nylon" data-density="1.14">Nylon</option>
+                  <option value="ASA" data-density="1.07">ASA</option>
+                  <option value="PC" data-density="1.20">Policarbonato (PC)</option>
+                  <option value="Resina" data-density="1.10">Resina (SLA)</option>
+                  <option value="Outro" data-density="1.20">Outro</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="c3dFilamentPrice">Preço do Filamento (R$/kg)</label>
+                <input type="number" id="c3dFilamentPrice" class="form-input" value="120" min="0" step="0.01" />
+              </div>
+            </div>
+
+            <div class="form-row two-cols">
+              <div class="form-group">
+                <label for="c3dFilamentWeight">Peso do Filamento Usado (g)</label>
+                <input type="number" id="c3dFilamentWeight" class="form-input" value="50" min="0" step="0.1" placeholder="Peso em gramas" />
+              </div>
+              <div class="form-group">
+                <label for="c3dFilamentWaste">Desperdício / Suporte (%)</label>
+                <input type="number" id="c3dFilamentWaste" class="form-input" value="5" min="0" max="100" step="1" />
+              </div>
+            </div>
+
+            <!-- Energia -->
+            <div class="calc3d-section-label">⚡ Energia Elétrica</div>
+
+            <div class="form-row two-cols">
+              <div class="form-group">
+                <label for="c3dEnergyPrice">Preço do kWh (R$)</label>
+                <input type="number" id="c3dEnergyPrice" class="form-input" value="0.85" min="0" step="0.01" />
+              </div>
+              <div class="form-group">
+                <label for="c3dPrinterWatts">Potência da Impressora (W)</label>
+                <input type="number" id="c3dPrinterWatts" class="form-input" value="350" min="0" step="1" />
+              </div>
+            </div>
+
+            <div class="form-row two-cols">
+              <div class="form-group">
+                <label for="c3dPrintHours">Tempo de Impressão (horas)</label>
+                <input type="number" id="c3dPrintHours" class="form-input" value="4" min="0" step="0.1" />
+              </div>
+              <div class="form-group">
+                <label for="c3dPrintMinutes">Minutos adicionais</label>
+                <input type="number" id="c3dPrintMinutes" class="form-input" value="30" min="0" max="59" step="1" />
+              </div>
+            </div>
+
+            <!-- Equipamento -->
+            <div class="calc3d-section-label">🖨️ Depreciação do Equipamento</div>
+
+            <div class="form-row two-cols">
+              <div class="form-group">
+                <label for="c3dPrinterCost">Custo da Impressora (R$)</label>
+                <input type="number" id="c3dPrinterCost" class="form-input" value="2500" min="0" step="0.01" />
+              </div>
+              <div class="form-group">
+                <label for="c3dPrinterLifespan">Vida Útil da Impressora (horas)</label>
+                <input type="number" id="c3dPrinterLifespan" class="form-input" value="3000" min="1" step="1" />
+              </div>
+            </div>
+
+            <!-- Desgaste -->
+            <div class="calc3d-section-label">🔧 Desgaste e Manutenção</div>
+
+            <div class="form-row two-cols">
+              <div class="form-group">
+                <label for="c3dNozzleCost">Custo do Bico (R$)</label>
+                <input type="number" id="c3dNozzleCost" class="form-input" value="25" min="0" step="0.01" />
+              </div>
+              <div class="form-group">
+                <label for="c3dNozzleLife">Vida Útil do Bico (horas)</label>
+                <input type="number" id="c3dNozzleLife" class="form-input" value="500" min="1" step="1" />
+              </div>
+            </div>
+
+            <div class="form-row two-cols">
+              <div class="form-group">
+                <label for="c3dBedCost">Custo da Mesa/Build Plate (R$)</label>
+                <input type="number" id="c3dBedCost" class="form-input" value="80" min="0" step="0.01" />
+              </div>
+              <div class="form-group">
+                <label for="c3dBedLife">Vida Útil da Mesa (horas)</label>
+                <input type="number" id="c3dBedLife" class="form-input" value="1500" min="1" step="1" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="c3dOtherMaintenance">Outros Custos de Manutenção por hora (R$)</label>
+              <input type="number" id="c3dOtherMaintenance" class="form-input" value="0.50" min="0" step="0.01" />
+            </div>
+
+            <!-- Mão de Obra -->
+            <div class="calc3d-section-label">👤 Mão de Obra</div>
+
+            <div class="form-row two-cols">
+              <div class="form-group">
+                <label for="c3dLaborRate">Valor da Hora de Trabalho (R$/h)</label>
+                <input type="number" id="c3dLaborRate" class="form-input" value="30" min="0" step="0.01" />
+              </div>
+              <div class="form-group">
+                <label for="c3dLaborTime">Tempo de Trabalho Manual (min)</label>
+                <input type="number" id="c3dLaborTime" class="form-input" value="30" min="0" step="1" />
+                <small style="color:var(--color-text-muted);font-size:11px">Preparo, pós-processamento, lixar, pintar, etc.</small>
+              </div>
+            </div>
+
+            <!-- Margem e risco -->
+            <div class="calc3d-section-label">📊 Margem e Risco</div>
+
+            <div class="form-row two-cols">
+              <div class="form-group">
+                <label for="c3dFailRate">Taxa de Falha (%)</label>
+                <input type="number" id="c3dFailRate" class="form-input" value="8" min="0" max="100" step="1" />
+                <small style="color:var(--color-text-muted);font-size:11px">% das impressões que falham e precisam ser refeitas.</small>
+              </div>
+              <div class="form-group">
+                <label for="c3dProfitMargin">Margem de Lucro (%)</label>
+                <input type="number" id="c3dProfitMargin" class="form-input" value="50" min="0" step="1" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="c3dQuantity">Quantidade de Peças</label>
+              <input type="number" id="c3dQuantity" class="form-input" value="1" min="1" step="1" />
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn-secondary" id="c3dResetBtn">Resetar</button>
+              <button type="submit" class="btn-primary btn-lg" id="c3dCalcBtn">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                  <path d="M9 2v14M2 9h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Calcular Preço
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Right: Results -->
+        <div class="calc3d-results" id="calc3dResults">
+
+          <div class="widget">
+            <div class="widget-header">
+              <h2 class="widget-title">💰 Resultado</h2>
+            </div>
+
+            <!-- Final price hero -->
+            <div class="calc3d-hero">
+              <span class="calc3d-hero-label">Preço de Venda Sugerido</span>
+              <span class="calc3d-hero-value" id="c3dFinalPrice">R$ 0,00</span>
+              <span class="calc3d-hero-sub" id="c3dPricePerUnit">por unidade</span>
+            </div>
+
+            <!-- Cost breakdown -->
+            <div class="calc3d-breakdown">
+              <div class="calc3d-row">
+                <span>🧵 Material</span>
+                <span id="c3dCostMaterial">R$ 0,00</span>
+              </div>
+              <div class="calc3d-row">
+                <span>⚡ Energia</span>
+                <span id="c3dCostEnergy">R$ 0,00</span>
+              </div>
+              <div class="calc3d-row">
+                <span>🖨️ Depreciação</span>
+                <span id="c3dCostDepreciation">R$ 0,00</span>
+              </div>
+              <div class="calc3d-row">
+                <span>🔧 Desgaste/Manutenção</span>
+                <span id="c3dCostWear">R$ 0,00</span>
+              </div>
+              <div class="calc3d-row">
+                <span>👤 Mão de Obra</span>
+                <span id="c3dCostLabor">R$ 0,00</span>
+              </div>
+              <div class="calc3d-row calc3d-row-divider"></div>
+              <div class="calc3d-row calc3d-row-subtotal">
+                <span>Custo Base</span>
+                <span id="c3dSubtotal">R$ 0,00</span>
+              </div>
+              <div class="calc3d-row">
+                <span>⚠️ Ajuste de Falhas (<span id="c3dFailRateLabel">0</span>%)</span>
+                <span id="c3dCostFail">+ R$ 0,00</span>
+              </div>
+              <div class="calc3d-row calc3d-row-divider"></div>
+              <div class="calc3d-row calc3d-row-subtotal">
+                <span>Custo Total</span>
+                <span id="c3dTotalCost">R$ 0,00</span>
+              </div>
+              <div class="calc3d-row calc3d-row-profit">
+                <span>📈 Lucro (<span id="c3dProfitLabel">0</span>%)</span>
+                <span id="c3dProfitValue">+ R$ 0,00</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Per-unit card if qty > 1 -->
+          <div class="widget" id="c3dBatchCard" style="display:none">
+            <div class="widget-header">
+              <h2 class="widget-title">📦 Lote</h2>
+            </div>
+            <div class="calc3d-breakdown">
+              <div class="calc3d-row">
+                <span>Quantidade</span>
+                <span id="c3dBatchQty">1</span>
+              </div>
+              <div class="calc3d-row">
+                <span>Custo Total do Lote</span>
+                <span id="c3dBatchTotal">R$ 0,00</span>
+              </div>
+              <div class="calc3d-row">
+                <span>Preço Total de Venda</span>
+                <span id="c3dBatchSaleTotal">R$ 0,00</span>
+              </div>
+              <div class="calc3d-row calc3d-row-profit">
+                <span>Lucro Total do Lote</span>
+                <span id="c3dBatchProfit">R$ 0,00</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Modal (quick add from topbar) -->
+  <div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modalTitle">Nova Transação</h3>
+        <button class="btn-icon" id="closeModalBtn" aria-label="Fechar modal">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M15 5L5 15M5 5l10 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <form id="modalForm" novalidate>
+        <div class="form-group">
+          <label>Tipo</label>
+          <div class="type-toggle">
+            <button type="button" class="type-btn active" data-type="income" id="modalTypeIncome">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M7 11V3M3 7l4-4 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>Receita
+            </button>
+            <button type="button" class="type-btn" data-type="expense" id="modalTypeExpense">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M7 3v8M3 7l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>Despesa
+            </button>
+          </div>
+          <input type="hidden" id="modalTxType" value="income"/>
+        </div>
+        <div class="form-group">
+          <label for="modalDescription">Descrição *</label>
+          <input type="text" id="modalDescription" class="form-input" placeholder="Descrição da transação" maxlength="80" required />
+        </div>
+        <div class="form-row two-cols">
+          <div class="form-group">
+            <label for="modalAmount">Valor (R$) *</label>
+            <input type="number" id="modalAmount" class="form-input" placeholder="0,00" min="0.01" step="0.01" required />
+          </div>
+          <div class="form-group">
+            <label for="modalDate">Data *</label>
+            <input type="date" id="modalDate" class="form-input" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="modalCategory">Categoria</label>
+          <select id="modalCategory" class="form-input form-select">
+            <option value="">Selecionar</option>
+            <option value="Vendas">Vendas</option>
+            <option value="Serviços">Serviços</option>
+            <option value="Comissões">Comissões</option>
+            <option value="Aluguel">Aluguel</option>
+            <option value="Salários">Salários</option>
+            <option value="Fornecedores">Fornecedores</option>
+            <option value="Marketing">Marketing</option>
+            <option value="Utilidades">Utilidades</option>
+            <option value="Impostos">Impostos</option>
+            <option value="Outros">Outros</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" id="cancelModalBtn">Cancelar</button>
+          <button type="submit" class="btn-primary">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast" role="alert" aria-live="polite"></div>
+
+  <!-- Supabase Configuration -->
+  <script src="supabase-config.js"></script>
+
+  <!-- App Main Script (as ES Module) -->
+  <script type="module" src="app.js"></script>
+</body>
+</html>

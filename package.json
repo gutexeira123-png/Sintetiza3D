@@ -1,0 +1,21 @@
+{
+  "name": "financas-pro",
+  "version": "1.0.0",
+  "description": "Aplicação de controle financeiro para pequenas empresas com Supabase",
+  "type": "module",
+  "main": "app.js",
+  "scripts": {
+    "dev": "http-server -p 8000 --cors",
+    "build": "echo 'No build needed for vanilla JS'",
+    "test": "node test-app.js && node test-js.js && node test-dom.js"
+  },
+  "keywords": ["finance", "supabase", "transactions"],
+  "author": "FinançasPRO",
+  "license": "MIT",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.43.0"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
