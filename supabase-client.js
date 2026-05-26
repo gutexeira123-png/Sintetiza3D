@@ -58,11 +58,21 @@ export async function getTransactions(options = {}) {
   }
 
   try {
-    // Buscar do Supabase
-    const { data, error } = await supabaseClient
+    // Obter user_id atual
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    const userId = session?.user?.id;
+
+    // Buscar do Supabase - filtrar por user_id se existir
+    let query = supabaseClient
       .from('transactions')
       .select('*')
       .order('date', { ascending: false });
+
+    if (userId) {
+      query = query.eq('user_id', userId);
+    }
+
+    const { data, error } = await query;
 
     if (error) {
       console.error('❌ Erro ao buscar transações:', error);
@@ -94,6 +104,10 @@ export async function createTransaction(txData) {
   }
 
   try {
+    // Obter user_id atual
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    const userId = session?.user?.id || null;
+
     const { data, error } = await supabaseClient
       .from('transactions')
       .insert([{
@@ -103,7 +117,7 @@ export async function createTransaction(txData) {
         category: txData.category || null,
         date: txData.date,
         note: txData.note || null,
-        user_id: null // Preparado para autenticação futura
+        user_id: userId
       }])
       .select();
 
@@ -145,7 +159,7 @@ export async function deleteTransaction(transactionId) {
     // Limpar cache
     clearCache();
     console.log('✅ Transação deletada com sucesso');
-    return { success: true };
+    return { success: true, error: null };
   } catch (error) {
     console.error('❌ Erro ao deletar transação:', error);
     return { error: error.message };
@@ -175,7 +189,7 @@ export async function updateTransaction(transactionId, updates) {
 
     clearCache();
     console.log('✅ Transação atualizada com sucesso');
-    return { data: data?.[0] };
+    return { data: data?.[0], error: null };
   } catch (error) {
     console.error('❌ Erro ao atualizar transação:', error);
     return { error: error.message };
