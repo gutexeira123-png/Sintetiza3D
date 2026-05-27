@@ -5,8 +5,43 @@ const SUPABASE_ANON_KEY = window.SUPABASE_CONFIG?.anonKey || '';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+// Mouse Reactive Background
+function setupMouseGlow() {
+  const glow = document.getElementById('bgGlow');
+  if (!glow) return;
+
+  let rafId = null;
+  let mouseX = window.innerWidth / 2;
+  let mouseY = window.innerHeight / 2;
+  let currentX = mouseX;
+  let currentY = mouseY;
+
+  function updateGlow() {
+    currentX += (mouseX - currentX) * 0.08;
+    currentY += (mouseY - currentY) * 0.08;
+    document.documentElement.style.setProperty('--mouse-x', currentX + 'px');
+    document.documentElement.style.setProperty('--mouse-y', currentY + 'px');
+    rafId = null;
+  }
+
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    if (!rafId) {
+      rafId = requestAnimationFrame(updateGlow);
+    }
+  });
+
+  document.addEventListener('mouseleave', () => {
+    mouseX = window.innerWidth / 2;
+    mouseY = window.innerHeight / 2;
+  });
+}
+
 // Redirecionar se já estiver logado
 document.addEventListener('DOMContentLoaded', async () => {
+  setupMouseGlow();
+
   const { data: { session } } = await supabase.auth.getSession();
   if (session) {
     window.location.href = 'index.html';

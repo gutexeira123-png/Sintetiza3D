@@ -1176,6 +1176,52 @@ function setupViralScan() {
   });
 }
 
+// ── Mouse Reactive Background ────────────────────────────
+function setupMouseGlow() {
+  const glow = document.getElementById('bgGlow');
+  if (!glow) return;
+
+  let rafId = null;
+  let mouseX = window.innerWidth / 2;
+  let mouseY = window.innerHeight / 2;
+  let currentX = mouseX;
+  let currentY = mouseY;
+
+  function updateGlow() {
+    currentX += (mouseX - currentX) * 0.08;
+    currentY += (mouseY - currentY) * 0.08;
+    document.documentElement.style.setProperty('--mouse-x', currentX + 'px');
+    document.documentElement.style.setProperty('--mouse-y', currentY + 'px');
+    rafId = null;
+  }
+
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    if (!rafId) {
+      rafId = requestAnimationFrame(updateGlow);
+    }
+  });
+
+  document.addEventListener('mouseleave', () => {
+    mouseX = window.innerWidth / 2;
+    mouseY = window.innerHeight / 2;
+  });
+
+  // Adjust glow opacity based on scroll
+  let scrollRAF = null;
+  window.addEventListener('scroll', () => {
+    if (!scrollRAF) {
+      scrollRAF = requestAnimationFrame(() => {
+        const scrollPercent = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+        const opacity = 0.25 + (scrollPercent * 0.2);
+        document.documentElement.style.setProperty('--glow-opacity', Math.min(opacity, 0.6));
+        scrollRAF = null;
+      });
+    }
+  });
+}
+
 // ── Init ──────────────────────────────────────────────────
 async function init() {
   // Verificar autenticação
@@ -1211,6 +1257,7 @@ async function init() {
   });
 
   setupTheme();
+  setupMouseGlow();
   setupSidebar();
   setupNav();
   setupMainForm();
