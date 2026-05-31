@@ -897,6 +897,7 @@ const ideiasData = {
 };
 
 const ideiasAllItems = [];
+window.__debug = { ideiasData, ideiasAllItems };
 for (const cat in ideiasData) {
   ideiasData[cat].items.forEach(item => {
     ideiasAllItems.push({ category: cat, text: item, emoji: ideiasData[cat].emoji });
@@ -935,6 +936,10 @@ function ideiasDisplay(filter) {
 }
 
 function setupIdeias() {
+  console.log('[IDEIAS] ideiasData loaded:', Object.keys(ideiasData).length, 'categorias');
+  console.log('[IDEIAS] Total items:', ideiasAllItems.length);
+  console.log('[IDEIAS] Amostra:', ideiasAllItems.slice(0, 3).map(i => i.text));
+
   const generateBtn = document.getElementById('ideiasGenerateBtn');
   if (!generateBtn) return;
 
