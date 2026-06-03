@@ -94,6 +94,12 @@
         </svg>
         <span>Ideias de Conteúdo</span>
       </a>
+      <a href="#quotes" class="nav-item" id="nav-quotes">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M4 9h12M9 4l2 6M9 4l-2 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <span>Orçamentos</span>
+      </a>
     </nav>
 
     <div class="sidebar-footer">
@@ -720,6 +726,268 @@
 
     </section>
 
+    <!-- Quotes Section -->
+    <section class="section" id="section-quotes">
+      <div class="calc3d-header">
+        <div class="calc3d-header-icon">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <rect x="4" y="4" width="24" height="24" rx="3" stroke="currentColor" stroke-width="2"/>
+            <path d="M8 8l8 8M8 16l8-8" stroke="currentColor" stroke-width="2"/>
+          </svg>
+        </div>
+        <div>
+          <h2 class="widget-title" style="font-size:18px">Gerador de Orçamentos</h2>
+          <p style="font-size:13px;color:var(--color-text-muted);margin-top:4px">Crie orçamentos profissionais e gere PDFs para enviar aos clientes</p>
+        </div>
+      </div>
+
+      <div class="calc3d-layout">
+        <!-- Left: Form -->
+        <div class="widget calc3d-form-widget">
+          <div class="widget-header">
+            <h2 class="widget-title">📋 Dados do Orçamento</h2>
+          </div>
+          <form id="quotesForm" class="transaction-form" novalidate>
+            <!-- Informações do Orçamento -->
+            <div class="calc3d-section-label">📄 Informações do Orçamento</div>
+
+            <div class="form-row two-cols">
+              <div class="form-group">
+                <label for="quoteNumber">Número do Orçamento *</label>
+                <input type="text" id="quoteNumber" class="form-input" placeholder="Ex: ORC-2026-001" required />
+              </div>
+              <div class="form-group">
+                <label for="quoteDate">Data de Emissão *</label>
+                <input type="date" id="quoteDate" class="form-input" required />
+              </div>
+            </div>
+
+            <div class="form-row two-cols">
+              <div class="form-group">
+                <label for="validUntil">Validade Até</label>
+                <input type="date" id="validUntil" class="form-input" />
+              </div>
+              <div class="form-group">
+                <label for="taxRate">Alíquota de Imposto (%)</label>
+                <input type="number" id="taxRate" class="form-input" value="0" min="0" step="0.1" />
+              </div>
+            </div>
+
+            <!-- Dados do Cliente -->
+            <div class="calc3d-section-label">👤 Dados do Cliente</div>
+
+            <div class="form-row two-cols">
+              <div class="form-group">
+                <label for="clientName">Nome/Razão Social *</label>
+                <input type="text" id="clientName" class="form-input" placeholder="Nome do cliente" required />
+              </div>
+              <div class="form-group">
+                <label for="clientCnpjCpf">CNPJ/CPF</label>
+                <input type="text" id="clientCnpjCpf" class="form-input" placeholder="00.000.000/0000-00" />
+              </div>
+            </div>
+
+            <div class="form-row two-cols">
+              <div class="form-group">
+                <label for="clientAddress">Endereço</label>
+                <input type="text" id="clientAddress" class="form-input" placeholder="Logradouro, número" />
+              </div>
+              <div class="form-group">
+                <label for="clientAddress2">Complemento</label>
+                <input type="text" id="clientAddress2" class="form-input" placeholder="Bairro, apartamento" />
+              </div>
+            </div>
+
+            <div class="form-row two-cols">
+              <div class="form-group">
+                <label for="clientCity">Cidade</label>
+                <input type="text" id="clientCity" class="form-input" />
+              </div>
+              <div class="form-group">
+                <label for="clientState">Estado</label>
+                <input type="text" id="clientState" class="form-input" placeholder="EX: SP" maxlength="2" />
+              </div>
+            </div>
+
+            <div class="form-row two-cols">
+              <div class="form-group">
+                <label for="clientZip">CEP</label>
+                <input type="text" id="clientZip" class="form-input" placeholder="00000-000" />
+              </div>
+              <div class="form-group">
+                <label for="clientIe">Inscrição Estadual</label>
+                <input type="text" id="clientIe" class="form-input" placeholder="Isento se não tiver" />
+              </div>
+            </div>
+
+            <div class="form-row two-cols">
+              <div class="form-group">
+                <label for="clientEmail">E-mail</label>
+                <input type="email" id="clientEmail" class="form-input" placeholder="cliente@email.com" />
+              </div>
+              <div class="form-group">
+                <label for="clientPhone">Telefone</label>
+                <input type="tel" id="clientPhone" class="form-input" placeholder="(11) 99999-9999" />
+              </div>
+            </div>
+
+            <!-- Dados da Empresa (predefinidos, mas editáveis) -->
+            <div class="calc3d-section-label">🏢 Dados da Sua Empresa</div>
+
+            <div class="form-row two-cols">
+              <div class="form-group">
+                <label for="companyName">Nome/Razão Social *</label>
+                <input type="text" id="companyName" class="form-input" value="Minha Empresa" required />
+              </div>
+              <div class="form-group">
+                <label for="companyCnpj">CNPJ</label>
+                <input type="text" id="companyCnpj" class="form-input" placeholder="00.000.000/0000-00" />
+              </div>
+            </div>
+
+            <div class="form-row two-cols">
+              <div class="form-group">
+                <label for="companyAddress">Endereço</label>
+                <input type="number" id="companyAddress" class="form-input" placeholder="Logradouro, número" />
+              </div>
+              <div class="form-group">
+                <label for="companyAddress2">Complemento</label>
+                <input type="text" id="companyAddress2" class="form-input" placeholder="Bairro, apartamento" />
+              </div>
+            </div>
+
+            <div class="form-row two-cols">
+              <div class="form-group">
+                <label for="companyCity">Cidade</label>
+                <input type="text" id="companyCity" class="form-input" value="" />
+              </div>
+              <div class="form-group">
+                <label for="companyState">Estado</label>
+                <input type="text" id="companyState" class="form-input" placeholder="EX: SP" maxlength="2" />
+              </div>
+            </div>
+
+            <div class="form-row two-cols">
+              <div class="form-group">
+                <label for="companyZip">CEP</label>
+                <input type="text" id="companyZip" class="form-input" placeholder="00000-000" />
+              </div>
+              <div class="form-group">
+                <label for="companyIe">Inscrição Estadual</label>
+                <input type="text" id="companyIe" class="form-input" />
+              </div>
+            </div>
+
+            <div class="form-row two-cols">
+              <div class="form-group">
+                <label for="companyEmail">E-mail</label>
+                <input type="email" id="companyEmail" class="form-input" value="" />
+              </div>
+              <div class="form-group">
+                <label for="companyPhone">Telefone</label>
+                <input type="tel" id="companyPhone" class="form-input" placeholder="" />
+              </div>
+            </div>
+
+            <!-- Itens do Orçamento -->
+            <div class="calc3d-section-label">📋 Itens do Orçamento</div>
+
+            <div id="quoteItemsContainer">
+              <!-- Itens serão adicionados dinamicamente aqui -->
+              <div class="quote-item-row">
+                <div class="form-group">
+                  <label for="itemDescription_1">Descrição do Item *</label>
+                  <input type="text" id="itemDescription_1" class="form-input item-description" placeholder="Descreva o produto ou serviço" required />
+                </div>
+                <div class="form-group two-in-one">
+                  <label>Quantidade</label>
+                  <input type="number" id="itemQuantity_1" class="form-input item-quantity" value="1" min="0.01" step="0.01" />
+                </div>
+                <div class="form-group two-in-one">
+                  <label>Preço Unitário (R$)</label>
+                  <input type="number" id="itemPrice_1" class="form-input item-price" value="0" min="0" step="0.01" />
+                </div>
+                <div class="form-group two-in-one">
+                  <label>Desconto (%)</label>
+                  <input type="number" id="itemDiscount_1" class="form-input item-discount" value="0" min="0" max="100" step="0.1" />
+                </div>
+                <div class="form-group">
+                  <label style="margin-top:8px;">Subtotal: <span id="itemSubtotal_1" class="item-subtotal">R$ 0,00</span></label>
+                </div>
+                <button type="button" class="btn-icon remove-item-btn" title="Remover item" aria-label="Remover item" style="margin-top:24px;">
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                    <path d="M3 3l12 12M15 3l-12 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-top:16px;">
+              <button type="button" class="btn-secondary" id="addItemBtn">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                  <path d="M9 3v12M3 9h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                Adicionar Item
+              </button>
+            </div>
+
+            <!-- Desconto Adicional -->
+            <div class="calc3d-section-label">💰 Descontos Adicionais</div>
+
+            <div class="form-row two-cols">
+              <div class="form-group">
+                <label for="additionalDiscountType">Tipo de Desconto</label>
+                <select id="additionalDiscountType" class="form-input form-select">
+                  <option value="percent">Percentual (%)</option>
+                  <option value="fixed">Valor Fixo (R$)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="additionalDiscount">Valor do Desconto</label>
+                <input type="number" id="additionalDiscount" class="form-input" value="0" min="0" step="0.01" />
+              </div>
+            </div>
+
+            <!-- Observações e Termos -->
+            <div class="calc3d-section-label">📝 Observações e Termos</div>
+
+            <div class="form-row two-cols">
+              <div class="form-group">
+                <label for="quoteNotes">Observações</label>
+                <textarea id="quoteNotes" class="form-input form-textarea" placeholder="Observações sobre o orçamento..." rows="3"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="quoteTerms">Termos e Condições</label>
+                <textarea id="quoteTerms" class="form-input form-textarea" placeholder="Termos e condições do orçamento..." rows="3"></textarea>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn-secondary" id="quotesResetBtn">Resetar</button>
+              <button type="button" class="btn-primary btn-lg" id="quotesGeneratePdfBtn">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                  <path d="M14 2l-3 3h3l-5 5v2h8v-8H9l-5 5H4v8h4v-2l5-5H4v-2h10z" stroke="currentColor" stroke-width="1.8"/>
+                </svg>
+                Gerar PDF
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Right: Preview -->
+        <div class="calc3d-results" id="quotesPreview">
+          <div class="widget">
+            <div class="widget-header">
+              <h2 class="widget-title">👀 Visualização do Orçamento</h2>
+            </div>
+            <div id="quotesTemplate">
+              <!-- Template será preenchido dinamicamente -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <!-- Modal (quick add from topbar) -->
@@ -793,6 +1061,9 @@
 
   <!-- Supabase Configuration -->
   <script src="supabase-config.js"></script>
+
+  <!-- HTML2PDF Library for PDF Generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-+sVNHbYBZLjEfnA6ymRZn+9r9d5EjR4F9qF6JZ6cW+6v7Q6Kj6J6v6Q6Kj6J6v6Q6Kj6J6v6Q6Kj6J6v6Q6Kj6J6v6Q6Kj6J6" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
   <!-- App Main Script (as ES Module) -->
   <script type="module" src="app-v2.js"></script>

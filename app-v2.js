@@ -404,8 +404,8 @@ function validateForm(fields) {
 }
 
 // ── Navigation ────────────────────────────────────────────
-const sections = ['dashboard', 'transactions', 'add', 'calc3d', 'ideias'];
-const pageTitles = { dashboard: 'Painel Financeiro', transactions: 'Transações', add: 'Nova Transação', calc3d: 'Precificação 3D', ideias: 'Ideias de Conteúdo' };
+const sections = ['dashboard', 'transactions', 'add', 'calc3d', 'ideias', 'quotes'];
+const pageTitles = { dashboard: 'Painel Financeiro', transactions: 'Transações', add: 'Nova Transação', calc3d: 'Precificação 3D', ideias: 'Ideias de Conteúdo', quotes: 'Gerador de Orçamentos' };
 
 function navigateTo(page) {
   sections.forEach(s => {
@@ -970,6 +970,422 @@ function setupIdeias() {
   setupViralScan();
 }
 
+// ── Orçamentos (Quotes) ─────────────────────────────────────
+function setupQuotes() {
+  const form = document.getElementById('quotesForm');
+  const preview = document.getElementById('quotesPreview');
+  if (!form) return;
+
+  // Default values for form fields
+  const defaults = {
+    // Informações do orçamento
+    quoteNumber: '',
+    quoteDate: todayISO(),
+    validUntil: '',
+
+    // Dados do cliente
+    clientName: '',
+    clientAddress: '',
+    clientCity: '',
+    clientState: '',
+    clientZip: '',
+    clientCnpjCpf: '',
+    clientIe: '',
+    clientEmail: '',
+    clientPhone: '',
+
+    // Dados da empresa (poderia vir de configuração)
+    companyName: 'Minha Empresa',
+    companyAddress: '',
+    companyCity: '',
+    companyState: '',
+    companyZip: '',
+    companyCnpj: '',
+    companyIe: '',
+    companyEmail: '',
+    companyPhone: '',
+
+    // Itens do orçamento (array de objetos)
+    quoteItems: [
+      { description: '', quantity: 1, unitPrice: 0, discount: 0 }
+    ],
+
+    // Configurações de cálculo
+    taxRate: 0, // percentual
+    additionalDiscount: 0, // percentual ou valor fixo
+    additionalDiscountType: 'percent', // percent ou fixed
+
+    // Observações
+    notes: '',
+    terms: ''
+  };
+
+  // Helper function to format date as YYYY-MM-DD
+  function todayISO() {
+    return new Date().toISOString().split('T')[0];
+  }
+
+  // Helper function to format currency
+  function formatCurrency(value) {
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+  }
+
+  // Funções auxiliares para manipulação dinâmica de itens
+  function addQuoteItem() {
+    const itemsContainer = document.getElementById('quoteItemsContainer');
+    if (!itemsContainer) return;
+
+    const itemIndex = document.querySelectorAll('.quote-item-row').length;
+    const itemHtml = `
+      <div class="quote-item-row" data-index="${itemIndex}">
+        <div class="form-group">
+          <label>Descrição</label>
+          <input type="text" class="form-input quote-item-description" placeholder="Descreva o item/serviço">
+        </div>
+        <div class="form-group">
+          <label>Quantidade</label>
+          <input type="number" class="form-input quote-item-quantity" min="0" step="0.01" value="1">
+        </div>
+        <div class="form-group">
+          <label>Preço Unitário</label>
+          <input type="number" class="form-input quote-item-unit-price" min="0" step="0.01" value="0">
+        </div>
+        <div class="form-group">
+          <label>Desconto (%)</label>
+          <input type="number" class="form-input quote-item-discount" min="0" max="100" step="0.01" value="0">
+        </div>
+        <div class="form-group">
+          <label>Subtotal</label>
+          <div class="quote-item-subtotal">R$ 0,00</div>
+        </div>
+        <button type="button" class="btn-remove-item" title="Remover item">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M1 5h16M7 1l5 5M7 7l5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    `;
+    itemsContainer.insertAdjacentHTML('beforeend', itemHtml);
+
+    // Add event listeners to new inputs
+    const newItem = itemsContainer.lastElementChild;
+    newItem.querySelectorAll('.quote-item-description, .quote-item-quantity, .quote-item-unit-price, .quote-item-discount').forEach(input => {
+      input.addEventListener('input', updateItemsDisplay);
+    });
+    newItem.querySelector('.btn-remove-item').addEventListener('click', function() {
+      removeQuoteItem(this.closest('.quote-item-row').dataset.index);
+    });
+  }
+
+  function removeQuoteItem(index) {
+    const itemsContainer = document.getElementById('quoteItemsContainer');
+    if (!itemsContainer) return;
+
+    const itemToRemove = itemsContainer.querySelector(`.quote-item-row[data-index="${index}"]`);
+    if (itemToRemove) {
+      itemToRemove.remove();
+
+      // Re-index remaining items
+      itemsContainer.querySelectorAll('.quote-item-row').forEach((item, newIndex) => {
+        item.dataset.index = newIndex;
+      });
+    }
+
+    updateItemsDisplay();
+  }
+
+  function updateItemsDisplay() {
+    const itemsContainer = document.getElementById('quoteItemsContainer');
+    if (!itemsContainer) return;
+
+    const items = [];
+    itemsContainer.querySelectorAll('.quote-item-row').forEach((item, index) => {
+      const description = item.querySelector('.quote-item-description').value;
+      const quantity = parseFloat(item.querySelector('.quote-item-quantity').value) || 0;
+      const unitPrice = parseFloat(item.querySelector('.quote-item-unit-price').value) || 0;
+      const discount = parseFloat(item.querySelector('.quote-item-discount').value) || 0;
+
+      items.push({
+        description,
+        quantity,
+        unitPrice,
+        discount
+      });
+    });
+
+    // Update preview
+    generatePreview(items);
+  }
+
+  function calculateTotals(items) {
+    let subtotal = 0;
+
+    items.forEach(item => {
+      const itemTotal = item.quantity * item.unitPrice * (1 - item.discount / 100);
+      subtotal += itemTotal;
+    });
+
+    const additionalDiscountValue = parseFloat(document.getElementById('additionalDiscount').value) || 0;
+    const additionalDiscountType = document.getElementById('additionalDiscountType').value;
+
+    let additionalDiscountAmount = 0;
+    if (additionalDiscountType === 'percent') {
+      additionalDiscountAmount = subtotal * (additionalDiscountValue / 100);
+    } else {
+      additionalDiscountAmount = additionalDiscountValue;
+    }
+
+    const subtotalAfterDiscount = subtotal - additionalDiscountAmount;
+    const taxRate = parseFloat(document.getElementById('taxRate').value) || 0;
+    const taxAmount = subtotalAfterDiscount * (taxRate / 100);
+    const total = subtotalAfterDiscount + taxAmount;
+
+    return {
+      subtotal,
+      additionalDiscountAmount,
+      subtotalAfterDiscount,
+      taxAmount,
+      total
+    };
+  }
+
+  function generatePreview(items) {
+    const template = document.getElementById('quotesTemplate');
+    if (!template) return;
+
+    const quoteNumber = document.getElementById('quoteNumber').value || 'ORC-0001';
+    const quoteDate = document.getElementById('quoteDate').value || todayISO();
+    const validUntil = document.getElementById('validUntil').value || '';
+
+    const clientName = document.getElementById('clientName').value || '';
+    const clientAddress = document.getElementById('clientAddress').value || '';
+    const clientCity = document.getElementById('clientCity').value || '';
+    const clientState = document.getElementById('clientState').value || '';
+    const clientZip = document.getElementById('clientZip').value || '';
+    const clientCnpjCpf = document.getElementById('clientCnpjCpf').value || '';
+    const clientIe = document.getElementById('clientIe').value || '';
+    const clientEmail = document.getElementById('clientEmail').value || '';
+    const clientPhone = document.getElementById('clientPhone').value || '';
+
+    const companyName = document.getElementById('companyName').value || defaults.companyName;
+    const companyAddress = document.getElementById('companyAddress').value || '';
+    const companyAddress2 = document.getElementById('companyAddress2').value || '';
+    const companyCity = document.getElementById('companyCity').value || '';
+    const companyState = document.getElementById('companyState').value || '';
+    const companyZip = document.getElementById('companyZip').value || '';
+    const companyCnpj = document.getElementById('companyCnpj').value || '';
+    const companyIe = document.getElementById('companyIe').value || '';
+    const companyEmail = document.getElementById('companyEmail').value || '';
+    const companyPhone = document.getElementById('companyPhone').value || '';
+
+    const taxRate = parseFloat(document.getElementById('taxRate').value) || 0;
+    const additionalDiscountValue = parseFloat(document.getElementById('additionalDiscount').value) || 0;
+    const additionalDiscountType = document.getElementById('additionalDiscountType').value;
+    const notes = document.getElementById('quoteNotes').value || '';
+    const terms = document.getElementById('quoteTerms').value || '';
+
+    const totals = calculateTotals(items);
+
+    template.innerHTML = `
+      <div class="quote-template">
+        <div class="quote-header">
+          <div class="quote-info">
+            <h1>ORÇAMENTO</h1>
+            <p><strong>Nº:</strong> ${quoteNumber}</p>
+            <p><strong>Data:</strong> ${quoteDate}</p>
+            <p><strong>Validade:</strong> ${validUntil}</p>
+          </div>
+
+          <div class="company-info">
+            <h2>${companyName}</h2>
+            ${companyAddress ? `<p>${companyAddress}</p>` : ''}
+            ${companyAddress2 ? `<p>${companyAddress2}</p>` : ''}
+            ${companyCity && companyState ? `<p>${companyCity}, ${companyState} ${companyZip}</p>` : ''}
+            ${companyCnpj ? `<p>CNPJ: ${companyCnpj}</p>` : ''}
+            ${companyIe ? `<p>IE: ${companyIe}</p>` : ''}
+            ${companyEmail ? `<p>E-mail: ${companyEmail}</p>` : ''}
+            ${companyPhone ? `<p>Telefone: ${companyPhone}</p>` : ''}
+          </div>
+        </div>
+
+        <div class="client-info">
+          <h2>Dados do Cliente</h2>
+          <p><strong>Nome:</strong> ${clientName}</p>
+          ${clientAddress ? `<p><strong>Endereço:</strong> ${clientAddress}</p>` : ''}
+          ${clientCity && clientState ? `<p><strong>Cidade/Estado:</strong> ${clientCity}, ${clientState} ${clientZip}</p>` : ''}
+          ${clientCnpjCpf ? `<p><strong>CNPJ/CPF:</strong> ${clientCnpjCpf}</p>` : ''}
+          ${clientIe ? `<p><strong>IE:</strong> ${clientIe}</p>` : ''}
+          <p><strong>E-mail:</strong> ${clientEmail}</p>
+          <p><strong>Telefone:</strong> ${clientPhone}</p>
+        </div>
+
+        <div class="quote-items-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Descrição</th>
+                <th>Qtd.</th>
+                <th>Unitário</th>
+                <th>Desc. (%)</th>
+                <th>Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${items.map((item, index) => `
+                <tr>
+                  <td>${item.description}</td>
+                  <td>${item.quantity}</td>
+                  <td>${formatCurrency(item.unitPrice)}</td>
+                  <td>${item.discount}%</td>
+                  <td>${formatCurrency(item.quantity * item.unitPrice * (1 - item.discount / 100))}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="quote-totals">
+          <div class="totals-row">
+            <span>Subtotal:</span>
+            <span>${formatCurrency(totals.subtotal)}</span>
+          </div>
+          <div class="totals-row">
+            <span>Desconto Adicional:</span>
+            <span>- ${formatCurrency(totals.additionalDiscountAmount)}</span>
+          </div>
+          <div class="totals-row">
+            <span>Base de Cálculo:</span>
+            <span>${formatCurrency(totals.subtotalAfterDiscount)}</span>
+          </div>
+          <div class="totals-row">
+            <span>Impostos (${taxRate}%):</span>
+            <span>${formatCurrency(totals.taxAmount)}</span>
+          </div>
+          <div class="totals-row total-row">
+            <span>TOTAL:</span>
+            <span>${formatCurrency(totals.total)}</span>
+          </div>
+        </div>
+
+        ${notes ? `<div class="quote-notes"><h3>Observações:</h3><p>${notes}</p></div>` : ''}
+        ${terms ? `<div class="quote-terms"><h3>Termos e Condições:</h3><p>${terms}</p></div>` : ''}
+      </div>
+    `;
+  }
+
+  function generatePdf() {
+    const element = document.getElementById('quotesTemplate');
+    if (!element) return;
+
+    const quoteNumber = document.getElementById('quoteNumber').value || 'orcamento';
+    const filename = `orcamento_${quoteNumber}_${new Date().toISOString().split('T')[0]}.pdf`;
+
+    const opt = {
+      margin: [10, 10, 10, 10],
+      filename: filename,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    // Garantir que os estilos sejam aplicados antes de gerar
+    html2pdf().set(opt).from(element).save();
+  }
+
+  // Event listeners
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+
+    // Coleta dados do formulário e atualiza preview
+    const itemsContainer = document.getElementById('quoteItemsContainer');
+    if (!itemsContainer) return;
+
+    const items = [];
+    itemsContainer.querySelectorAll('.quote-item-row').forEach(item => {
+      const description = item.querySelector('.quote-item-description').value;
+      const quantity = parseFloat(item.querySelector('.quote-item-quantity').value) || 0;
+      const unitPrice = parseFloat(item.querySelector('.quote-item-unit-price').value) || 0;
+      const discount = parseFloat(item.querySelector('.quote-item-discount').value) || 0;
+
+      items.push({
+        description,
+        quantity,
+        unitPrice,
+        discount
+      });
+    });
+
+    updateItemsDisplay();
+    generatePreview(items);
+  });
+
+  // Add item button
+  const addItemBtn = document.getElementById('addItemBtn');
+  if (addItemBtn) {
+    addItemBtn.addEventListener('click', addQuoteItem);
+  }
+
+  // Reset button
+  const resetBtn = document.getElementById('quotesResetBtn');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      form.reset();
+      // Reset items container to have one empty item
+      const itemsContainer = document.getElementById('quoteItemsContainer');
+      if (itemsContainer) {
+        itemsContainer.innerHTML = '';
+        addQuoteItem(); // Add one empty item
+      }
+      generatePreview([]);
+    });
+  }
+
+  // PDF button
+  const pdfBtn = document.getElementById('quotesGeneratePdfBtn');
+  if (pdfBtn) {
+    pdfBtn.addEventListener('click', generatePdf);
+  }
+
+  // Real-time updates for calculation fields
+  const calcFields = form.querySelectorAll('#taxRate, #additionalDiscount, #additionalDiscountType');
+  calcFields.forEach(field => {
+    field.addEventListener('input', () => {
+      const itemsContainer = document.getElementById('quoteItemsContainer');
+      if (itemsContainer) {
+        const items = [];
+        itemsContainer.querySelectorAll('.quote-item-row').forEach(item => {
+          const description = item.querySelector('.quote-item-description').value;
+          const quantity = parseFloat(item.querySelector('.quote-item-quantity').value) || 0;
+          const unitPrice = parseFloat(item.querySelector('.quote-item-unit-price').value) || 0;
+          const discount = parseFloat(item.querySelector('.quote-item-discount').value) || 0;
+
+          items.push({
+            description,
+            quantity,
+            unitPrice,
+            discount
+          });
+        });
+        generatePreview(items);
+      }
+    });
+  });
+
+  // Inicialização
+  Object.entries(defaults).forEach(([key, value]) => {
+    const el = document.getElementById(`quote${key.charAt(0).toUpperCase() + key.slice(1)}`);
+    if (el) {
+      if (el.type === 'date' && !value) el.value = todayISO();
+      else if (el.type !== 'hidden') el.value = value;
+    }
+  });
+
+  // Primeira atualização
+  addQuoteItem(); // Adiciona um item vazio inicialmente
+  updateItemsDisplay();
+  generatePreview([]);
+}
+
 // ── Viral Scan ─────────────────────────────────────────────
 const viralMockData = {
   youtube: [
@@ -1313,6 +1729,7 @@ async function init() {
   setupResize();
   setup3DCalculator();
   setupIdeias();
+  setupQuotes();
 
   // Carregar transações do Supabase
   await loadTransactions();

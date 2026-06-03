@@ -34,3 +34,6 @@ npm-debug.log*
 # Cache
 .cache/
 .parcel-cache/
+
+# Local Netlify folder
+.netlify
