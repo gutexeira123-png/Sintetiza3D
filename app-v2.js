@@ -1585,7 +1585,7 @@ function viralGenerateRoteiro(title, creator, platform, platformData) {
     `💡 Dica: ${bodyTip}`,
     ``,
     `📝 Pontos principais para abordar:`,
-    `${platformData.roteiro.split('. ').map((p, i) => `  ${i + 1}. ${p.trim()}`).join('\n')}`,
+    `${(platformData.roteiro || r.passos.join('. ')).split('. ').map((p, i) => `  ${i + 1}. ${p.trim()}`).join('\n')}`,
     ``,
     `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
     `  🎯 FINALIZAÇÃO`,
