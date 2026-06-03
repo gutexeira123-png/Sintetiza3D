@@ -57,6 +57,16 @@ function todayISO() {
   return new Date().toISOString().split('T')[0];
 }
 
+function escapeHtml(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function categoryIcon(category) {
   const icons = {
     'Vendas': '🛍️', 'Serviços': '🔧', 'Comissões': '🤝', 'Investimentos': '📈',
@@ -117,8 +127,8 @@ function renderRecentList() {
     <div class="tx-item" data-id="${tx.id}">
       <div class="tx-icon ${tx.type}">${categoryIcon(tx.category)}</div>
       <div class="tx-info">
-        <div class="tx-desc">${tx.description}</div>
-        <div class="tx-meta">${tx.category || 'Sem categoria'} · ${formatDate(tx.date)}</div>
+        <div class="tx-desc">${escapeHtml(tx.description)}</div>
+        <div class="tx-meta">${escapeHtml(tx.category || 'Sem categoria')} · ${formatDate(tx.date)}</div>
       </div>
       <div class="tx-amount ${tx.type}">
         ${tx.type === 'income' ? '+' : '-'}${formatCurrency(tx.amount)}
@@ -158,12 +168,12 @@ function renderTable() {
     <tr data-id="${tx.id}">
       <td>${formatDate(tx.date)}</td>
       <td>
-        <div style="font-weight:600">${tx.description}</div>
-        ${tx.note ? `<div style="font-size:12px;color:var(--color-text-muted)">${tx.note}</div>` : ''}
+        <div style="font-weight:600">${escapeHtml(tx.description)}</div>
+        ${tx.note ? `<div style="font-size:12px;color:var(--color-text-muted)">${escapeHtml(tx.note)}</div>` : ''}
       </td>
       <td>
         <span style="display:inline-flex;align-items:center;gap:4px">
-          ${categoryIcon(tx.category)}&nbsp;${tx.category || '—'}
+          ${categoryIcon(tx.category)}&nbsp;${escapeHtml(tx.category || '—')}
         </span>
       </td>
       <td>
@@ -379,7 +389,7 @@ function renderAll() {
 // ── Toast ─────────────────────────────────────────────────
 function showToast(message, type = 'success') {
   const toast = document.getElementById('toast');
-  toast.innerHTML = `<div class="toast-dot"></div><span>${message}</span>`;
+  toast.innerHTML = '<div class="toast-dot"></div><span>' + escapeHtml(message) + '</span>';
   toast.className = `toast ${type} show`;
   clearTimeout(toast._timer);
   toast._timer = setTimeout(() => {
@@ -1186,37 +1196,39 @@ function setupQuotes() {
 
     const totals = calculateTotals(items);
 
+    function h(str) { return escapeHtml(str); }
+
     template.innerHTML = `
       <div class="quote-template">
         <div class="quote-header">
           <div class="quote-info">
             <h1>ORÇAMENTO</h1>
-            <p><strong>Nº:</strong> ${quoteNumber}</p>
-            <p><strong>Data:</strong> ${quoteDate}</p>
-            <p><strong>Validade:</strong> ${validUntil}</p>
+            <p><strong>Nº:</strong> ${h(quoteNumber)}</p>
+            <p><strong>Data:</strong> ${h(quoteDate)}</p>
+            <p><strong>Validade:</strong> ${h(validUntil)}</p>
           </div>
 
           <div class="company-info">
-            <h2>${companyName}</h2>
-            ${companyAddress ? `<p>${companyAddress}</p>` : ''}
-            ${companyAddress2 ? `<p>${companyAddress2}</p>` : ''}
-            ${companyCity && companyState ? `<p>${companyCity}, ${companyState} ${companyZip}</p>` : ''}
-            ${companyCnpj ? `<p>CNPJ: ${companyCnpj}</p>` : ''}
-            ${companyIe ? `<p>IE: ${companyIe}</p>` : ''}
-            ${companyEmail ? `<p>E-mail: ${companyEmail}</p>` : ''}
-            ${companyPhone ? `<p>Telefone: ${companyPhone}</p>` : ''}
+            <h2>${h(companyName)}</h2>
+            ${companyAddress ? `<p>${h(companyAddress)}</p>` : ''}
+            ${companyAddress2 ? `<p>${h(companyAddress2)}</p>` : ''}
+            ${companyCity && companyState ? `<p>${h(companyCity)}, ${h(companyState)} ${h(companyZip)}</p>` : ''}
+            ${companyCnpj ? `<p>CNPJ: ${h(companyCnpj)}</p>` : ''}
+            ${companyIe ? `<p>IE: ${h(companyIe)}</p>` : ''}
+            ${companyEmail ? `<p>E-mail: ${h(companyEmail)}</p>` : ''}
+            ${companyPhone ? `<p>Telefone: ${h(companyPhone)}</p>` : ''}
           </div>
         </div>
 
         <div class="client-info">
           <h2>Dados do Cliente</h2>
-          <p><strong>Nome:</strong> ${clientName}</p>
-          ${clientAddress ? `<p><strong>Endereço:</strong> ${clientAddress}</p>` : ''}
-          ${clientCity && clientState ? `<p><strong>Cidade/Estado:</strong> ${clientCity}, ${clientState} ${clientZip}</p>` : ''}
-          ${clientCnpjCpf ? `<p><strong>CNPJ/CPF:</strong> ${clientCnpjCpf}</p>` : ''}
-          ${clientIe ? `<p><strong>IE:</strong> ${clientIe}</p>` : ''}
-          <p><strong>E-mail:</strong> ${clientEmail}</p>
-          <p><strong>Telefone:</strong> ${clientPhone}</p>
+          <p><strong>Nome:</strong> ${h(clientName)}</p>
+          ${clientAddress ? `<p><strong>Endereço:</strong> ${h(clientAddress)}</p>` : ''}
+          ${clientCity && clientState ? `<p><strong>Cidade/Estado:</strong> ${h(clientCity)}, ${h(clientState)} ${h(clientZip)}</p>` : ''}
+          ${clientCnpjCpf ? `<p><strong>CNPJ/CPF:</strong> ${h(clientCnpjCpf)}</p>` : ''}
+          ${clientIe ? `<p><strong>IE:</strong> ${h(clientIe)}</p>` : ''}
+          <p><strong>E-mail:</strong> ${h(clientEmail)}</p>
+          <p><strong>Telefone:</strong> ${h(clientPhone)}</p>
         </div>
 
         <div class="quote-items-table">
@@ -1233,10 +1245,10 @@ function setupQuotes() {
             <tbody>
               ${items.map((item, index) => `
                 <tr>
-                  <td>${item.description}</td>
-                  <td>${item.quantity}</td>
+                  <td>${h(item.description)}</td>
+                  <td>${h(String(item.quantity))}</td>
                   <td>${formatCurrency(item.unitPrice)}</td>
-                  <td>${item.discount}%</td>
+                  <td>${h(String(item.discount))}%</td>
                   <td>${formatCurrency(item.quantity * item.unitPrice * (1 - item.discount / 100))}</td>
                 </tr>
               `).join('')}
@@ -1258,7 +1270,7 @@ function setupQuotes() {
             <span>${formatCurrency(totals.subtotalAfterDiscount)}</span>
           </div>
           <div class="totals-row">
-            <span>Impostos (${taxRate}%):</span>
+            <span>Impostos (${h(String(taxRate))}%):</span>
             <span>${formatCurrency(totals.taxAmount)}</span>
           </div>
           <div class="totals-row total-row">
@@ -1267,8 +1279,8 @@ function setupQuotes() {
           </div>
         </div>
 
-        ${notes ? `<div class="quote-notes"><h3>Observações:</h3><p>${notes}</p></div>` : ''}
-        ${terms ? `<div class="quote-terms"><h3>Termos e Condições:</h3><p>${terms}</p></div>` : ''}
+        ${notes ? `<div class="quote-notes"><h3>Observações:</h3><p>${h(notes)}</p></div>` : ''}
+        ${terms ? `<div class="quote-terms"><h3>Termos e Condições:</h3><p>${h(terms)}</p></div>` : ''}
       </div>
     `;
   }

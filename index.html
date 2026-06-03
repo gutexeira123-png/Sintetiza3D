@@ -5,23 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FinançasPRO – Controle Financeiro</title>
   <meta name="description" content="Controle financeiro simples e eficiente para pequenas empresas. Gerencie receitas, despesas e saldo em tempo real." />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.supabase.co; base-uri 'self'; form-action 'self'" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css?v=20250531" />
   <script>
-    (function() {
-      var SITE_PASSWORD = 'Sintetiza2901';
-      var gateKey = 'financaspro_access';
-      if (sessionStorage.getItem(gateKey) !== 'granted') {
-        var pwd = prompt('🔒 Site Privado\n\nDigite a senha de acesso:');
-        if (pwd !== SITE_PASSWORD) {
-          document.write('<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:#0f0f1a;font-family:Inter,sans-serif;color:#e2e8f0;flex-direction:column;gap:12px;text-align:center;padding:24px"><h1 style="font-size:24px">🔒 Acesso Negado</h1><p style="color:#94a3b8;font-size:14px">Senha incorreta. Recarregue a página para tentar novamente.</p></div>');
-          throw new Error('Access denied');
-        }
-        sessionStorage.setItem(gateKey, 'granted');
-      }
-    })();
+    var ENV = 'production';
   </script>
 </head>
 <body>
