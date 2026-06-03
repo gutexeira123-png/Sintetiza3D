@@ -1704,6 +1704,7 @@ function setupViralScan() {
           );
           roteiroContent.textContent = roteiro;
           roteiroSection.style.display = 'block';
+          roteiroSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
       });
     });
@@ -1744,6 +1745,14 @@ function setupViralScan() {
       statusEl.innerHTML = `<span class="viral-scan-status-icon">📡</span><span>${allData.length} vídeos encontrados no ${platformCap}${badges}</span>`;
 
       renderItems(filtered);
+
+      // Auto-select first result to show step-by-step guide immediately
+      if (filtered.length > 0) {
+        setTimeout(() => {
+          const firstItem = resultsList.querySelector('.viral-result-item');
+          if (firstItem) firstItem.click();
+        }, 100);
+      }
     }, animate ? 600 : 0);
   }
 
