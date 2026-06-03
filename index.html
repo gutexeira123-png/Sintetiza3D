@@ -675,20 +675,23 @@
 
             <div class="viral-scan-status" id="viralScanStatus">
               <span class="viral-scan-status-icon">📡</span>
-              <span>Clique em "Iniciar Varredura" para buscar os vídeos mais virais sobre Impressão 3D</span>
+              <span>Varredura automática ativada! Navegando pelos vídeos mais virais...</span>
             </div>
 
-            <div style="text-align:center;margin-bottom:20px">
-              <button class="btn-primary btn-lg" id="viralScanBtn">
-                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                  <path d="M9 2v14M2 9h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-                Iniciar Varredura
+            <div class="viral-search">
+              <svg class="viral-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+              <input class="viral-search-input" id="viralSearchInput" type="text" placeholder="Buscar vídeos virais em tempo real..." autocomplete="off">
+              <button class="viral-refresh-btn" id="viralRefreshBtn" title="Atualizar varredura">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/></svg>
               </button>
+              <span class="viral-search-count" id="viralSearchCount">15 resultados</span>
             </div>
 
-            <div class="viral-results" id="viralResults" style="display:none">
+            <div class="viral-results" id="viralResults">
               <div class="viral-results-list" id="viralResultsList"></div>
+              <div class="viral-no-results" id="viralNoResults" style="display:none">
+                Nenhum vídeo encontrado para "<span id="viralNoResultsTerm"></span>"
+              </div>
 
               <div class="viral-rotreio" id="viralRoteiroSection" style="display:none">
                 <div class="viral-rotreio-header">
